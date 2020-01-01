@@ -99,13 +99,13 @@ const BurgerBuilder = () => {
           totalPrice={burger.totalPrice}
         />
       </Modal>
-      <div>
+      {/* <div>
         {Object.entries(burger.ingredients).map(x => (
           <p key={x[0]}>
             {x[0]} : {x[1]}
           </p>
         ))}
-      </div>
+      </div> */}
       <Burger ingredients={burger.ingredients} />
       <BuildControls
         addIngredients={addIngredientHandler}
