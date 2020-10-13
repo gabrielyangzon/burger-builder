@@ -1,30 +1,10 @@
-import React, { useState, useEffect } from "react";
-import { Route } from "react-router-dom";
+import React from "react";
+import { Route, Redirect } from "react-router-dom";
 import ContactData from "./ContactData/ContactData";
 import CheckoutSummary from "../../components/Order/CheckoutSummary/CheckoutSummary";
+import { connect } from "react-redux";
 
-const CheckOut = props => {
-  const [data, setData] = useState({
-    ingredients: null,
-    totalPrice: 0
-  });
-
-  useEffect(() => {
-    const query = new URLSearchParams(props.location.search);
-    const ingredient = {};
-
-    let price = 0;
-    for (let param of query.entries()) {
-      if (param[0] === "price") {
-        price = param[1];
-      } else {
-        ingredient[param[0]] = +param[1];
-      }
-    }
-
-    setData({ ...data, ingredients: ingredient, totalPrice: price });
-  }, []);
-
+const CheckOut = (props) => {
   const checkOutCancelHandler = () => {
     props.history.goBack();
   };
@@ -33,29 +13,46 @@ const CheckOut = props => {
     props.history.push("/checkout/contact-data");
   };
 
-  return (
-    <React.Fragment>
-      Checkout page
-      {data.ingredients != null ? (
+  let summary = <Redirect to="/" />;
+  console.log(props.purchased);
+  if (props.ingredients) {
+    const purchasedRedirect = props.purchased ? <Redirect to="/" /> : null;
+
+    summary = (
+      <React.Fragment>
+        {purchasedRedirect}
         <CheckoutSummary
-          ingredients={data.ingredients}
+          ingredients={props.ingredients}
           checkOutCancel={checkOutCancelHandler}
           checkOutContinue={checkOutContinueHandler}
         />
-      ) : null}
-      <Route
-        exact
-        path={props.match.path + "/contact-data"}
-        render={props => (
-          <ContactData
-            ingredients={data.ingredients}
-            totalPrice={data.totalPrice}
-            {...props}
-          />
-        )}
-      />
-    </React.Fragment>
-  );
+        <Route
+          exact
+          path={props.match.path + "/contact-data"}
+          render={(props) => (
+            <ContactData
+              ingredients={props.ingredients}
+              totalPrice={props.totalPrice}
+              {...props}
+            />
+          )}
+        />
+      </React.Fragment>
+    );
+  }
+  return summary;
 };
 
-export default CheckOut;
+const mapStateToProps = (state) => {
+  return {
+    ingredients: state.burger.ingredients,
+    totalPrice: state.burger.totalPrice,
+    purchased: state.order.purchased,
+  };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {};
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(CheckOut);

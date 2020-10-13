@@ -1,5 +1,4 @@
 import React from "react";
-
 import styled from "styled-components";
 
 const Input = styled.div`
@@ -18,10 +17,8 @@ const InputElement = styled.input`
   width: 100%;
   outline: none;
   border: solid
-    ${props =>
-      !props.isValid && props.shouldValidate && !props.touched
-        ? " 1px #ccc"
-        : " 2px red"};
+    ${(props) =>
+      props.isValid && props.shouldValidate ? " 1px #ccc" : " 1px red"};
 
   background-color: white;
   font: inherit;
@@ -32,12 +29,8 @@ const InputElement = styled.input`
   }
 `;
 
-const input = props => {
+const input = (props) => {
   let inputElement = null;
-
-  //console.log(props.name + " " + props.isValid);
-  //console.log(props.shouldValidate);
-  //console.log(props.name + " " + !props.isTouched);
 
   switch (props.inputType) {
     case "input":
@@ -71,7 +64,7 @@ const input = props => {
           onChange={props.changed}
           touched={props.isTouched}
         >
-          {props.inputConfig.options.map(el => (
+          {props.inputConfig.options.map((el) => (
             <InputElement
               //   selected={el.selected}
               key={el.displayValue}

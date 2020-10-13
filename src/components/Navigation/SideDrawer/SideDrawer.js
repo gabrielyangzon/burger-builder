@@ -5,7 +5,7 @@ import Aux from "../../../hoc/Aux";
 import Logo from "../../Logo/Logo";
 import NavigationItems from "../../Navigation/NavigationItems/NavigationItems";
 
-const SideDrawer = props => {
+const SideDrawer = (props) => {
   let attachedClasses = [styles.SideDrawer, styles.Close];
 
   if (props.open) {
@@ -17,7 +17,10 @@ const SideDrawer = props => {
       <div className={attachedClasses.join(" ")}>
         <Logo height="11%" marginBottom="22px" />
         <ul>
-          <NavigationItems clicked={props.closed} />
+          <NavigationItems
+            isAuthenticated={props.isAuth}
+            clicked={props.closed}
+          />
         </ul>
       </div>
     </Aux>

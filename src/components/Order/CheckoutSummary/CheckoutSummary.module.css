@@ -7,7 +7,6 @@
 .IngredientsDiv {
   width: 100%;
   margin: auto;
-  border: solid 1px black;
 }
 
 @media (min-width: 600px) {

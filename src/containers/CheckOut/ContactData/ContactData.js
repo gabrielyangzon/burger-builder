@@ -4,107 +4,105 @@ import styles from "./ContactData.module.css";
 import axios from "../../../axios-orders";
 import Spinner from "../../../components/UI/spinners/spinners";
 import Input from "../../../components/UI/Input/Input";
+import { connect } from "react-redux";
+import withErrorHandler from "../../../hoc/withErrrorHandler/withErrorHandler";
 
-const ContactData = props => {
+import * as actionCreator from "../../../store/actions/index";
+
+const ContactData = (props) => {
   const [contactData, setContactData] = useState({
     orderForm: {
       name: {
         elementType: "input",
         elementConfig: {
           type: "text",
-          placeholder: "Name"
+          placeholder: "Name",
         },
         value: "",
         validation: {
           required: true,
-          lettersOnly: true
+          lettersOnly: true,
         },
         valid: false,
-        touched: false
+        touched: false,
       },
       street: {
         elementType: "input",
         elementConfig: {
           type: "text",
-          placeholder: "Street"
+          placeholder: "Street",
         },
         value: "",
         validation: {
-          required: true
+          required: true,
         },
         valid: false,
-        touched: false
+        touched: false,
       },
       email: {
         elementType: "input",
         elementConfig: {
           type: "text",
-          placeholder: "Email"
+          placeholder: "Email",
         },
         value: "",
         validation: {
-          required: true
+          required: true,
         },
         valid: false,
-        touched: false
+        touched: false,
       },
       zipCode: {
         elementType: "input",
         elementConfig: {
           type: "text",
-          placeholder: "Zip code"
+          placeholder: "Zip code",
         },
         value: "",
         validation: {
           required: true,
-          minLength: 5,
-          maxLength: 5
+          minLength: 4,
+          maxLength: 5,
         },
         valid: false,
-        touched: false
+        touched: false,
       },
       country: {
         elementType: "input",
         elementConfig: {
           type: "text",
-          placeholder: "Country"
+          placeholder: "Country",
         },
         value: "",
         validation: {
-          required: true
+          required: true,
         },
         valid: false,
-        touched: false
+        touched: false,
       },
       deliveryMethod: {
         elementType: "select",
         elementConfig: {
           options: [
             { value: "fastest", displayValue: "Fastest" },
-            { value: "cheapest", displayValue: "Cheapest", selected: true }
+            { value: "cheapest", displayValue: "Cheapest", selected: true },
           ],
-          value: ""
         },
+        value: "",
         valid: true,
-        touched: false
-      }
+        validation: {},
+      },
     },
     isFormValid: false,
-    loading: false
   });
 
-  const onOrderHandler = event => {
-    let date = new Date();
+  const onOrderHandler = (event) => {
     event.preventDefault();
 
     if (!contactData.isFormValid) {
       alert("form invalid");
       return;
     }
-
-    setContactData(current => {
-      return { ...current, loading: true };
-    });
 
     const formData = {};
 
@@ -114,27 +112,12 @@ const ContactData = props => {
 
     const order = {
       ingredients: props.ingredients,
-      totalPrice: props.totalPrice,
-      orderDetails: formData,
-      orderDate: date.toLocaleDateString() + " " + date.toLocaleTimeString()
+      price: props.totalPrice,
+      orderData: formData,
+      userId: props.userId,
     };
-    axios
-      .post("/orders.json", order)
-      .then(response => {
-        console.log(response.status);
-        setContactData(current => {
-          return { ...current, loading: false };
-        });
 
-        response.status === 200
-          ? props.history.push("/")
-          : console.log("error");
-      })
-      .catch(error =>
-        setContactData(current => {
-          return { ...current, loading: false };
-        })
-      );
+    props.onOrderClick(order, props.authToken);
   };
 
   const checkValidity = (value, rules) => {
@@ -175,11 +158,10 @@ const ContactData = props => {
 
     let isValid = true;
 
-    for (let inputIdentifier in currentFormElement) {
-      isValid = currentFormElement[inputIdentifier].valid && isValid;
+    for (let inputIdentifier in currentForm) {
+      isValid = currentForm[inputIdentifier].valid && isValid;
     }
 
-    console.log(isValid);
     currentForm[identifier] = currentFormElement;
 
     setContactData({ orderForm: currentForm, isFormValid: isValid });
@@ -188,32 +170,32 @@ const ContactData = props => {
   let form = (
     <form onSubmit={onOrderHandler}>
       {Object.entries(contactData.orderForm)
-        .map(data => {
+        .map((data) => {
           return {
             id: data[0],
-            config: data[1]
+            config: data[1],
           };
         })
-        .map(x => (
+        .map((x) => (
           <Input
             key={x.id}
             inputType={x.config.elementType}
             inputConfig={x.config.elementConfig}
             name={x.id}
             value={x.config.value}
-            changed={evt => onChangeInputhandler(evt, x.id)}
+            changed={(evt) => onChangeInputhandler(evt, x.id)}
             isValid={x.config.valid}
             shouldValidate={x.config.validation}
             isTouched={x.config.touched}
           />
         ))}
       <Button buttonType="Success" disabled={!contactData.isFormValid}>
-        Submit
+        Order
       </Button>
     </form>
   );
 
-  if (contactData.loading) {
+  if (props.loading) {
     form = <Spinner />;
   }
 
@@ -225,4 +207,24 @@ const ContactData = props => {
   );
 };
 
-export default ContactData;
+const mapStateToProps = (state) => {
+  return {
+    ingredients: state.burger.ingredients,
+    totalPrice: state.burger.totalPrice,
+    loading: state.order.loading,
+    authToken: state.auth.token,
+    userId: state.auth.userId,
+  };
+};
+
+const mapDistpatchToProps = (dispatch) => {
+  return {
+    onOrderClick: (orderData, token) =>
+      dispatch(actionCreator.purchaseBurger(orderData, token)),
+  };
+};
+
+export default connect(
+  mapStateToProps,
+  mapDistpatchToProps
+)(withErrorHandler(ContactData, axios));

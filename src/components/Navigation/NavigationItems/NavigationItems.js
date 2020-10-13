@@ -3,7 +3,7 @@ import styles from "./NavigationItems.module.css";
 
 import { NavLink } from "react-router-dom";
 
-const NavigationItems = props => {
+const NavigationItems = (props) => {
   return (
     <ul className={styles.NavigationItems}>
       <li className={styles.NavigationItem}>
@@ -15,7 +15,8 @@ const NavigationItems = props => {
           Burger Builder
         </NavLink>
       </li>
-      <li className={styles.NavigationItem}>
+
+      {/* <li className={styles.NavigationItem}>
         <NavLink
           activeClassName={styles.active}
           onClick={props.clicked}
@@ -23,15 +24,36 @@ const NavigationItems = props => {
         >
           Check out
         </NavLink>
-      </li>
+      </li> */}
+      {props.isAuthenticated ? (
+        <li className={styles.NavigationItem}>
+          <NavLink
+            activeClassName={styles.active}
+            onClick={props.clicked}
+            to="/orders"
+          >
+            Your orders
+          </NavLink>
+        </li>
+      ) : null}
       <li className={styles.NavigationItem}>
-        <NavLink
-          activeClassName={styles.active}
-          onClick={props.clicked}
-          to="/orders"
-        >
-          Your orders
-        </NavLink>
+        {props.isAuthenticated ? (
+          <NavLink
+            activeClassName={styles.active}
+            onClick={props.clicked}
+            to="/logout"
+          >
+            Logout
+          </NavLink>
+        ) : (
+          <NavLink
+            activeClassName={styles.active}
+            onClick={props.clicked}
+            to="/login"
+          >
+            Sign in
+          </NavLink>
+        )}
       </li>
     </ul>
   );
