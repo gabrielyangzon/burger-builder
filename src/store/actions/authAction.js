@@ -26,7 +26,7 @@ export const authenticateUser = (email, password, isSignUp) => {
       returnSecureToken: true,
     };
 
-    let apiKey = "AIzaSyBWvkyazJWocaUNyheuPIZ9wH8Ph_iGnlc";
+    let apiKey = "";
     let url =
       "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=" + apiKey;
 
